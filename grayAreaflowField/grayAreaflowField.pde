@@ -8,6 +8,8 @@ import gohai.simpletweet.*; //library to post to Twitter
 //maybe the "rules" change over time
 //AvenirNext Bold for the title
 //AvenirNext Regular for the instructions
+//chokidar module will watch a directory and send a callback on a new file
+//use Twitter module to tweet image on the above callback
 
 Serial myPort;
 SimpleTweet simpletweet;
@@ -222,9 +224,10 @@ void upSwipe() {
 
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
-  String tweet = simpletweet.tweetImage(get(), "#GrayAreaSpringImmersive2018");
-  println("Posted " + tweet);
-  background(255);
+  PImage pic = get();
+  //String tweet = simpletweet.tweetImage(pic, "#GrayAreaSpringImmersive2018");
+  // println("Posted " + tweet);
+  // background(255);
   colorNum++;
   if (colorNum > 6) {
     colorNum = 1;
