@@ -92,12 +92,12 @@ void setup() {
   myPort.bufferUntil('\n');
 
   simpletweet = new SimpleTweet(this); //Twitter variable
-  
+
   //Twitter credentials
-  simpletweet.setOAuthConsumerKey("fe96NGOMvwBKK07S5MT7iVaMT");
-  simpletweet.setOAuthConsumerSecret("rVvk3di9K9r2i8DKmSFIdOC4pdyu8zUe3mtdJPDAOAox4MlgF6");
-  simpletweet.setOAuthAccessToken("763439881141878784-0z27OGXe37Fl0sxGyiDPSQQSvHXGmUm");
-  simpletweet.setOAuthAccessTokenSecret("2ceQdt0cbDK7Rwz0rQXmPuocds6QrXwXs5EL1byilfrMl");
+  //simpletweet.setOAuthConsumerKey("fe96NGOMvwBKK07S5MT7iVaMT");
+  //simpletweet.setOAuthConsumerSecret("rVvk3di9K9r2i8DKmSFIdOC4pdyu8zUe3mtdJPDAOAox4MlgF6");
+  //simpletweet.setOAuthAccessToken("763439881141878784-0z27OGXe37Fl0sxGyiDPSQQSvHXGmUm");
+  //simpletweet.setOAuthAccessTokenSecret("2ceQdt0cbDK7Rwz0rQXmPuocds6QrXwXs5EL1byilfrMl");
 
   background(255);
 }
@@ -224,10 +224,8 @@ void upSwipe() {
 
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
-  PImage pic = get();
-  //String tweet = simpletweet.tweetImage(pic, "#GrayAreaSpringImmersive2018");
-  // println("Posted " + tweet);
-  // background(255);
+  save("../pics/image" + str(day()) + str(frameCount) + ".png");
+  background(255);
   colorNum++;
   if (colorNum > 6) {
     colorNum = 1;
