@@ -1,6 +1,5 @@
+import websockets.*;
 import processing.serial.*; //library to use the serial port
-
-import gohai.simpletweet.*; //library to post to Twitter
 
 //think about changing the "rules of the game"
 //stronger connection to incentives in the piece
@@ -12,7 +11,7 @@ import gohai.simpletweet.*; //library to post to Twitter
 //use Twitter module to tweet image on the above callback
 
 Serial myPort;
-SimpleTweet simpletweet;
+WebsocketClient wsc;
 PFont titleFont;
 PFont bodyFont;
 float inc = 0.1;
@@ -80,32 +79,27 @@ void setup() {
   colorNum = 1; //use the first color palette
   colorPalette = palette1;
   lineColor = colorPalette[colorIndex]; //set the particle color
-  titleFont = loadFont("AvenirNext-Bold-48.vlw");
-  bodyFont = loadFont("AvenirNext-Medium-36.vlw");
+  titleFont = loadFont("AvenirNext-Bold-48.vlw"); //font for title in instructions
+  bodyFont = loadFont("AvenirNext-Medium-36.vlw"); //font for instructions
 
+  //add 10,000 particles
   for (int i = 0; i < 10000; i++) {
     particles.add(new Particle(lineColor));
   }
 
-  println(Serial.list());
-  myPort = new Serial(this, Serial.list()[1], 115200);
-  myPort.bufferUntil('\n');
+  println(Serial.list()); //print list of available serial connections
+  myPort = new Serial(this, Serial.list()[1], 115200); //connect to second serial connection
+  myPort.bufferUntil('\n'); //read until an end of line character
+  
+  wsc= new WebsocketClient(this, "ws://localhost:3000/mysocket");
 
-  simpletweet = new SimpleTweet(this); //Twitter variable
-
-  //Twitter credentials
-  //simpletweet.setOAuthConsumerKey("fe96NGOMvwBKK07S5MT7iVaMT");
-  //simpletweet.setOAuthConsumerSecret("rVvk3di9K9r2i8DKmSFIdOC4pdyu8zUe3mtdJPDAOAox4MlgF6");
-  //simpletweet.setOAuthAccessToken("763439881141878784-0z27OGXe37Fl0sxGyiDPSQQSvHXGmUm");
-  //simpletweet.setOAuthAccessTokenSecret("2ceQdt0cbDK7Rwz0rQXmPuocds6QrXwXs5EL1byilfrMl");
-
-  background(255);
+  background(255); //set the screen to white
 }
 
 //read data from the serial port
 void serialEvent(Serial myPort) {
-  //read until the '\n' character
-  String inString = myPort.readStringUntil('\n');
+  
+  String inString = myPort.readStringUntil('\n'); //read until the '\n' character
 
   if (inString != null) { //only do something if data came across serial port
     inString = trim(inString); //remove white space
@@ -114,10 +108,14 @@ void serialEvent(Serial myPort) {
       changeZoff(); //change flow field pattern
       changeLineColor(); //change particle color
     } else if (inString.equals("D")) { //check for down gesture
-      println("down swipe");
-      downSwipe();
+      println("down swipe"); //log the down swipe
+      downSwipe(); //call function to save image and start a new one
     }
   }
+}
+
+void webSocketEvent(String msg){
+ println("Got a websockets message: " + msg); //print websockets message when received
 }
 
 void draw() {
@@ -139,15 +137,15 @@ void draw() {
     text("Swipe any direction to return to the flow field", width/2, height*0.525);
   }
 
-  float yoff = 0;
-  for (int y = 0; y < rows; y++) {
-    float xoff = 0;
-    for (int x = 0; x < cols; x++) {
-      float angle = noise(xoff, yoff, zoff) * TWO_PI * 3;
-      PVector v = PVector.fromAngle(angle);
-      v.setMag(0.5);
-      flowfield[y][x] = v;
-      xoff += inc;
+  float yoff = 0; //set the y-offset to 0
+  for (int y = 0; y < rows; y++) { //loop through the rows of the 2D array
+    float xoff = 0; //set the x-offset to 0
+    for (int x = 0; x < cols; x++) { //loop through colomns of the 2D array
+      float angle = noise(xoff, yoff, zoff) * TWO_PI * 3; //create angle from perlin noise
+      PVector v = PVector.fromAngle(angle); //create vector from the angle
+      v.setMag(0.5); //set magnitude of the vector
+      flowfield[y][x] = v; //assign the vector to the 2D array
+      xoff += inc; //increment the x-offset
       //***************
       //draw the flow field to the canvas
       //***************
@@ -162,73 +160,75 @@ void draw() {
       //end of drawing flow field
       //***************
     }
-    yoff += inc;
+    yoff += inc; //increment the y-offset
   }
 
+  //loop through particles
   for (Particle part : particles) {
-    part.follow(flowfield);
-    part.update();
-    part.edges();
-    part.show();
-    part.updateColor(colorPalette[colorIndex]);
+    part.follow(flowfield); //get new force from vector in 2D array
+    part.update(); //update position of the particle accroding to the force
+    part.edges(); //move particle to opposite if off the screen
+    part.show(); //draw the particle to the screen
+    part.updateColor(colorPalette[colorIndex]); //set the color of the particle
   }
 }
 
+//change the path of the particle, called on left/right gesture
 void changeZoff() {
   zoff += random(0.005, 1);
 }
 
 //change the color of the lines
 void changeLineColor() {
-  colorIndex++;
+  colorIndex++; //move to the next color
   if (colorIndex > colorPalette.length - 1) {
-    colorIndex = 0;
+    colorIndex = 0; //go back to beginning of color palette if the index is too big
   }
-  //color c = colorPalette[colorIndex];
-  //for (Particle part : particles) {
-  //  part.updateColor(c);
-  //}
 }
 
+//used in place of the gesture swipes
 void keyPressed() {
+  //if instructions are on the page, then any gesture will remove them
   if (showInstructions) {
     if (keyCode == LEFT || keyCode == RIGHT || keyCode == UP || keyCode == DOWN) {
       removeInstructions();
     }
   } else if (keyCode == LEFT || keyCode == RIGHT) {
-    sideSwipe();
+    sideSwipe(); //called on left/right arrow (left/right gesture)
   } else if (keyCode == UP) {
-    upSwipe();
+    upSwipe(); //called on up arrow (up gesture)
   } else if (keyCode == DOWN) {
-    downSwipe();
+    downSwipe(); //called on down arrow (down gesture)
   }
 }
 
 //remove instructions from the screen
 void removeInstructions() {
-  background(255);
-  showInstructions = false;
+  background(255); //clear screen
+  showInstructions = false; //remove instructions
 }
 
 //change color of the particles on a left/right gesture
 void sideSwipe() {
-  changeZoff();
-  changeLineColor();
+  changeZoff(); //alter path of particle
+  changeLineColor(); //change particle color
 }
 
 //show instructions on an up gesture
 void upSwipe() {
-  background(255);
-  showInstructions = true;
+  background(255); //clear screen
+  showInstructions = true; //add the instructions
 }
 
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
-  save("../pics/image" + str(day()) + str(frameCount) + ".png");
-  background(255);
-  colorNum++;
+  //save image with unique file name
+  save("../pics/image-" + str(day()) + "-" + str(minute()) + "-" + str(millis()) + ".png");
+  wsc.sendMessage("Processing saved an image");
+  background(255); //clear screen
+  colorNum++; //change color palette
   if (colorNum > 6) {
-    colorNum = 1;
+    colorNum = 1; //if at the end of the palette list, start at the beginning
   }
   if (colorNum == 1) {
     colorPalette = palette1;
