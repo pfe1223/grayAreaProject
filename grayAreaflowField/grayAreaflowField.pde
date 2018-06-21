@@ -221,12 +221,8 @@ void upSwipe() {
 
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
-  //save image with unique file name
-  String picName = "../pics/awaiting/image-" + str(day()) + "-" + str(minute()) + "-" + str(millis()) + ".png";
-  save(picName);
-  //wsc.sendMessage("Processing saved an image");
-  //wsc.sendMessage(picName);
-  background(255); //clear screen
+  saveImage();
+  //background(255); //clear screen
   colorNum++; //change color palette
   if (colorNum > 6) {
     colorNum = 1; //if at the end of the palette list, start at the beginning
@@ -244,4 +240,10 @@ void downSwipe() {
   } else if (colorNum == 6) {
     colorPalette = palette6;
   }
+}
+
+void saveImage(){
+  //create a unique file name for the image
+  String picName = "../pics/awaiting/image-" + str(day()) + "-" + str(minute()) + "-" + str(millis()) + ".png";
+  save(picName); //save the image
 }
