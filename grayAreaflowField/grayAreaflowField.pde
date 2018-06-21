@@ -222,7 +222,12 @@ void upSwipe() {
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
   saveImage();
+  changeColorPalette();
   //background(255); //clear screen
+}
+
+//change the color palette
+void changeColorPalette(){
   colorNum++; //change color palette
   if (colorNum > 6) {
     colorNum = 1; //if at the end of the palette list, start at the beginning
@@ -242,6 +247,7 @@ void downSwipe() {
   }
 }
 
+//save the screen as an image in the 'awaiting' folder
 void saveImage(){
   //create a unique file name for the image
   String picName = "../pics/awaiting/image-" + str(day()) + "-" + str(minute()) + "-" + str(millis()) + ".png";
