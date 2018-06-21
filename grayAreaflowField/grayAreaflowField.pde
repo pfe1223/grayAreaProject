@@ -101,7 +101,7 @@ void serialEvent(Serial myPort) {
   
   String inString = myPort.readStringUntil('\n'); //read until the '\n' character
 
-  if (inString != null) { //only do something if data came across serial port
+  //if (inString != null) { //only do something if data came across serial port
     inString = trim(inString); //remove white space
     println(inString); //write to console
     if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
@@ -110,13 +110,12 @@ void serialEvent(Serial myPort) {
     } else if (inString.equals("D")) { //check for down gesture
       println("down swipe"); //log the down swipe
       downSwipe(); //call function to save image and start a new one
+    } else if (inString.equals("U")){ //check for up swipe
+      //println("up swipe"); //log the up swipe
+      upSwipe(); //call function to show instructions
     }
-  }
+  //}
 }
-
-//void webSocketEvent(String msg){
-// println("Got a websockets message: " + msg); //print websockets message when received
-//}
 
 void draw() {
   //background(255);
@@ -216,7 +215,7 @@ void sideSwipe() {
 
 //show instructions on an up gesture
 void upSwipe() {
-  background(255); //clear screen
+  //background(255); //clear screen
   showInstructions = true; //add the instructions
 }
 
