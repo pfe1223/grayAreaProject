@@ -1,6 +1,3 @@
-//fs rename to move, don't need Sync version
-//
-
 let chokidar = require('chokidar');
 let Twitter = require('twitter');
 const fs = require('fs');
@@ -19,48 +16,60 @@ let watcher = chokidar.watch('pics/awaiting/', {
   ignoreInitial: false
 });
 
-watcher.on('add', imagePath => {
-  //read the image from its location
-  let data = fs.readFileSync(imagePath);
+function postToTwitter(imagePath) {
+  let data = fs.readFileSync(imagePath); //read the image from its location
+  console.log(`Found a new file: ${imagePath}`); //log new image location
+  twitterUpload(imagePath, data); //upload image to twitter
+}
 
-  console.log(`Found a new file: ${imagePath}`);
-
-  //post the image to Twitter
-  client.post('media/upload', {
+function twitterUpload(imagePath, data) {
+  console.log(`Creating media string`);
+  let media = {
     media: data
-  }, function(error, media, response) {
-
+  };
+  let status;
+  client.post('media/upload', media, function(error, media, response) {
     if (!error) {
-
-      // If successful, a media object will be returned.
-      //console.log(media);
-
-      // Lets tweet it
-      let status = {
-        status: '#GrayAreaImmersive',
+      console.log(`Media string successful`)
+      // Status message for the tweet
+      status = {
+        status: '#GrayAreaImmersive', // Hashtag
         media_ids: media.media_id_string // Pass the media id string
-      }
-
-      client.post('statuses/update', status, function(error, tweet, response) {
-        if (!error) {
-          //console.log(tweet);
-          console.log("Twitter response status: " + response.statusCode);
-          if (response.statusCode === 200) {
-            //move tweeted image to sent folder
-            // console.log(`path: ${imagePath}`);
-            const imageBaseName = path.basename(imagePath);
-            const newImagePath = path.join('pics', 'sent', imageBaseName);
-
-            fs.rename(imagePath, newImagePath, (err) => {
-              if (err) throw err;
-              console.log(`${imagePath} => ${newImagePath}`);
-            });
-          }
-        }
-      });
-
+      };
+      twitterPost(imagePath, status);
     } else {
-      console.log(`There is an error: ${error}`);
+      console.log(`Media string response: ${response.statusCode}`);
     }
   });
+}
+
+function twitterPost(imagePath, status) {
+  console.log(`Posting to Twitter`)
+  let err, responseCode;
+  client.post('statuses/update', status, function(error, tweet, response) {
+    if (!error) {
+      responseCode = response.statusCode;
+      console.log(`Posting response: ${responseCode}`);
+    }
+  });
+  moveImage(imagePath, err, responseCode);
+}
+
+function moveImage(imagePath, err, responseCode) {
+  console.log(`Moving to sent folder`);
+  const imageBaseName = path.basename(imagePath);
+  const newImagePath = path.join('pics', 'sent', imageBaseName);
+
+  fs.rename(imagePath, newImagePath, (err) => {
+    if (err) throw err;
+    console.log(`${imagePath} => ${newImagePath}`);
+  });
+}
+
+function tryAgain() {
+
+}
+
+watcher.on('add', imagePath => {
+  postToTwitter(imagePath);
 });
