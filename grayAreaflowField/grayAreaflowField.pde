@@ -7,8 +7,6 @@ import processing.serial.*; //library to use the serial port
 //maybe the "rules" change over time
 //AvenirNext Bold for the title
 //AvenirNext Regular for the instructions
-//chokidar module will watch a directory and send a callback on a new file
-//use Twitter module to tweet image on the above callback
 
 Serial myPort;
 WebsocketClient wsc;
@@ -90,7 +88,7 @@ void setup() {
   println(Serial.list()); //print list of available serial connections
   myPort = new Serial(this, Serial.list()[1], 115200); //connect to second serial connection
   myPort.bufferUntil('\n'); //read until an end of line character
-  
+
   //wsc= new WebsocketClient(this, "ws://localhost:3000/mysocket");
 
   background(255); //set the screen to white
@@ -98,22 +96,27 @@ void setup() {
 
 //read data from the serial port
 void serialEvent(Serial myPort) {
-  
+
   String inString = myPort.readStringUntil('\n'); //read until the '\n' character
 
   //if (inString != null) { //only do something if data came across serial port
-    inString = trim(inString); //remove white space
-    println(inString); //write to console
-    if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
-      changeZoff(); //change flow field pattern
-      changeLineColor(); //change particle color
-    } else if (inString.equals("D")) { //check for down gesture
-      println("down swipe"); //log the down swipe
-      downSwipe(); //call function to save image and start a new one
-    } else if (inString.equals("U")){ //check for up swipe
-      //println("up swipe"); //log the up swipe
-      upSwipe(); //call function to show instructions
+  inString = trim(inString); //remove white space
+  println(inString); //write to console
+  //if instructions are on the page, then any gesture will remove them
+  if (showInstructions) {
+    if (inString.equals("L") || inString.equals("R") || inString.equals("U") || inString.equals("D")) {
+      removeInstructions();
     }
+  } else if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
+    changeZoff(); //change flow field pattern
+    changeLineColor(); //change particle color
+  } else if (inString.equals("D")) { //check for down gesture
+    println("down swipe"); //log the down swipe
+    downSwipe(); //call function to save image and start a new one
+  } else if (inString.equals("U")) { //check for up swipe
+    //println("up swipe"); //log the up swipe
+    upSwipe(); //call function to show instructions
+  }
   //}
 }
 
@@ -230,7 +233,7 @@ void downSwipe() {
 }
 
 //change the color palette
-void changeColorPalette(){
+void changeColorPalette() {
   colorNum++; //increment variable that controls the color palette
   if (colorNum > 6) {
     colorNum = 1; //if at the end of the palette list, start at the beginning
@@ -251,7 +254,7 @@ void changeColorPalette(){
 }
 
 //save the screen as an image in the 'awaiting' folder
-void saveImage(){
+void saveImage() {
   //create a unique file name for the image
   String picName = "../pics/awaiting/image-" + str(day()) + "-" + str(minute()) + "-" + str(millis()) + ".png";
   save(picName); //save the image
