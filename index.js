@@ -16,6 +16,10 @@ let watcher = chokidar.watch('pics/awaiting/', {
   ignoreInitial: false
 });
 
+watcher.on('add', imagePath => {
+  postToTwitter(imagePath);
+});
+
 function postToTwitter(imagePath) {
   let data = fs.readFileSync(imagePath); //read the image from its location
   console.log(`Found a new file: ${imagePath}`); //log new image location
@@ -33,7 +37,7 @@ function twitterUpload(imagePath, data) {
       console.log(`Media string successful`)
       // Status message for the tweet
       status = {
-        status: '#GrayAreaImmersive', // Hashtag
+        status: '#GrayAreaSpringImmersive2018', // Hashtag
         media_ids: media.media_id_string // Pass the media id string
       };
       twitterPost(imagePath, status);
@@ -69,7 +73,3 @@ function moveImage(imagePath, err, responseCode) {
 function tryAgain() {
 
 }
-
-watcher.on('add', imagePath => {
-  postToTwitter(imagePath);
-});
