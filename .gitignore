@@ -1,6 +1,7 @@
 # project ignores
 
 pics/
+credentials.env
 
 # Created by https://www.gitignore.io/api/node,macos,processing
 
