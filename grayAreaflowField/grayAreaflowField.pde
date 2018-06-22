@@ -78,8 +78,8 @@ void setup() {
   colorNum = 1; //use the first color palette
   colorPalette = palette1;
   lineColor = colorPalette[colorIndex]; //set the particle color
-  titleFont = loadFont("AvenirNext-Bold-48.vlw"); //font for title in instructions
-  bodyFont = loadFont("AvenirNext-Medium-36.vlw"); //font for instructions
+  titleFont = loadFont("AvenirNext-Bold-60.vlw"); //font for title in instructions
+  bodyFont = loadFont("AvenirNext-Medium-48.vlw"); //font for instructions
 
   //add 10,000 particles
   for (int i = 0; i < 10000; i++) {
