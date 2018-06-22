@@ -120,20 +120,20 @@ void serialEvent(Serial myPort) {
 void draw() {
   //background(255);
   if (showInstructions) {
-    background(255);
-    rectMode(CENTER);
-    noStroke();
-    fill(0, 10);
-    rect(width/2, height/2, width - 40, height - 40, 10);
-    textAlign(CENTER, CENTER);
-    fill(0);
-    textFont(titleFont);
-    text("Emergence", width/2, height*0.2);
-    textFont(bodyFont);
-    text("Swipe left or right to change the flow field", width/2, height*0.3);
-    text("Swipe down to tweet the flow field", width/2, height*0.375);
-    text("Check #GrayAreaSpringImmersive2018", width/2, height*0.45);
-    text("Swipe any direction to return to the flow field", width/2, height*0.525);
+    background(255); //clear the screen
+    rectMode(CENTER); //draw rectangle from its center
+    noStroke(); //turn off the stroke
+    fill(0, 10); //fill with a very transparent white
+    rect(width/2, height/2, width - 40, height - 40, 10); //draw a rectangle that is 40px smaller than the screen on all sides
+    textAlign(CENTER, CENTER); //center the text
+    fill(0); //use black for the text
+    textFont(titleFont); //use the larger font for the title
+    text("Emergence", width/2, height*0.2); //title for the screen
+    textFont(bodyFont); //switch to a smaller font for the rest of the instructions
+    text("Swipe left or right to change the flow field", width/2, height*0.3); //how to alter the drawing
+    text("Swipe down to tweet the flow field", width/2, height*0.375); //how to tweet the drawing
+    text("Check #GrayAreaSpringImmersive2018", width/2, height*0.45); //hashtag to find the drawing
+    text("Swipe any direction to return to the flow field", width/2, height*0.525); //how to return to the drawing
   }
 
   float yoff = 0; //set the y-offset to 0
@@ -147,6 +147,9 @@ void draw() {
       xoff += inc; //increment the x-offset
       //***************
       //draw the flow field to the canvas
+      //be sure to uncomment the 'background(255)'
+      //command at the top of draw to see the 
+      //flow field
       //***************
       //stroke(0, 100);
       //pushMatrix();
@@ -221,29 +224,29 @@ void upSwipe() {
 
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
-  saveImage();
-  changeColorPalette();
+  saveImage(); //call the function that saves the image
+  changeColorPalette(); //call the function that changes the color palette
   //background(255); //clear screen
 }
 
 //change the color palette
 void changeColorPalette(){
-  colorNum++; //change color palette
+  colorNum++; //increment variable that controls the color palette
   if (colorNum > 6) {
     colorNum = 1; //if at the end of the palette list, start at the beginning
   }
   if (colorNum == 1) {
-    colorPalette = palette1;
+    colorPalette = palette1; //use the first color palette
   } else if (colorNum == 2) {
-    colorPalette = palette2;
+    colorPalette = palette2; //use the second color palette
   } else if (colorNum == 3) {
-    colorPalette = palette3;
+    colorPalette = palette3; //use the third color palette
   } else if (colorNum == 4) {
-    colorPalette = palette4;
+    colorPalette = palette4; //use the fourth color palette
   } else if (colorNum == 5) {
-    colorPalette = palette5;
+    colorPalette = palette5; //use the fifth color palette
   } else if (colorNum == 6) {
-    colorPalette = palette6;
+    colorPalette = palette6; //use the sixth color palette
   }
 }
 
