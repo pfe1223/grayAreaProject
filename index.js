@@ -43,7 +43,7 @@ function twitterUpload(imagePath, data) {
       };
       twitterPost(imagePath, status);
     } else {
-      console.log(`Media string response: ${response.statusCode}`);
+      console.log("Media string response: ", response.body);
     }
   });
 }
