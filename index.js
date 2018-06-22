@@ -54,10 +54,10 @@ function twitterPost(imagePath, status) {
   client.post('statuses/update', status, function(error, tweet, response) {
     if (!error) {
       responseCode = response.statusCode;
-      console.log(`Posting response: ${responseCode}`);
+      console.log(`Success posting to Twitter: ${responseCode}`);
       moveImage(imagePath, err, responseCode);
     } else {
-      console.log('Error: ', responseCode);
+      console.log(`Error posting to Twitter: ${responseCode}`);
     }
   });
 }
