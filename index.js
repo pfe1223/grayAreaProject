@@ -55,9 +55,11 @@ function twitterPost(imagePath, status) {
     if (!error) {
       responseCode = response.statusCode;
       console.log(`Posting response: ${responseCode}`);
+      moveImage(imagePath, err, responseCode);
+    } else {
+      console.log('Error: ', responseCode);
     }
   });
-  moveImage(imagePath, err, responseCode);
 }
 
 function moveImage(imagePath, err, responseCode) {
