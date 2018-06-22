@@ -1,13 +1,14 @@
+require('dotenv').config()
 let chokidar = require('chokidar');
 let Twitter = require('twitter');
 const fs = require('fs');
 const path = require('path');
 
 let client = new Twitter({
-  consumer_key: 'fe96NGOMvwBKK07S5MT7iVaMT',
-  consumer_secret: 'rVvk3di9K9r2i8DKmSFIdOC4pdyu8zUe3mtdJPDAOAox4MlgF6',
-  access_token_key: '763439881141878784-0z27OGXe37Fl0sxGyiDPSQQSvHXGmUm',
-  access_token_secret: '2ceQdt0cbDK7Rwz0rQXmPuocds6QrXwXs5EL1byilfrMl'
+  consumer_key: process.env.CONSUMER_KEY,
+  consumer_secret: process.env.CONSUMER_SECRET,
+  access_token_key: process.env.ACCESS_TOKEN,
+  access_token_secret: process.env.ACCESS_TOKEN_SECRET
 });
 
 let watcher = chokidar.watch('pics/awaiting/', {
