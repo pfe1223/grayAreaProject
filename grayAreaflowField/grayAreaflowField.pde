@@ -25,7 +25,7 @@ color lineColor; //color of the particles
 color color1 = color(214, 35, 50, 5);
 color color2 = color(17, 54, 90, 5);
 color color3 = color(39, 188, 194, 5);
-color color4 = color(240, 242, 239, 5);
+color color4 = color(155, 89, 182, 5); 
 color color5 = color(248, 210, 0, 5);
 color[] palette1 = {color1, color2, color3, color4, color5};
 
@@ -78,8 +78,8 @@ void setup() {
   colorNum = 1; //use the first color palette
   colorPalette = palette1;
   lineColor = colorPalette[colorIndex]; //set the particle color
-  titleFont = loadFont("AvenirNext-Bold-60.vlw"); //font for title in instructions
-  bodyFont = loadFont("AvenirNext-Medium-48.vlw"); //font for instructions
+  titleFont = loadFont("AvenirNext-Bold-100.vlw"); //font for title in instructions
+  bodyFont = loadFont("AvenirNext-Regular-70.vlw"); //font for instructions
 
   //add 10,000 particles
   for (int i = 0; i < 10000; i++) {
@@ -132,12 +132,12 @@ void draw() {
     textAlign(CENTER, CENTER); //center the text
     fill(0); //use black for the text
     textFont(titleFont); //use the larger font for the title
-    text("Emergence", width/2, height*0.2); //title for the screen
+    text("Emergence", width/2, height*0.25); //title for the screen
     textFont(bodyFont); //switch to a smaller font for the rest of the instructions
-    text("Swipe left or right to change the flow field", width/2, height*0.3); //how to alter the drawing
-    text("Swipe down to tweet the flow field", width/2, height*0.375); //how to tweet the drawing
-    text("Check #GrayAreaSpringImmersive2018", width/2, height*0.45); //hashtag to find the drawing
-    text("Swipe any direction to return to the flow field", width/2, height*0.525); //how to return to the drawing
+    text("Swipe left/right to change the image", width/2, height*0.40); //how to alter the drawing
+    text("Swipe down to tweet the flow field", width/2, height*0.55); //how to tweet the drawing
+    text("#GrayAreaSpringImmersive2018", width/2, height*0.70); //hashtag to find the drawing
+    text("Swipe to return to the image", width/2, height*0.85); //how to return to the drawing
   }
 
   float yoff = 0; //set the y-offset to 0
