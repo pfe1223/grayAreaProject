@@ -19,6 +19,7 @@ float zoff = 0;
 ArrayList<Particle> particles = new ArrayList<Particle>();
 PVector[][] flowfield;
 boolean showInstructions = false;
+boolean clearScreen = false;
 
 //Color Variables
 int colorNum; //represents the color palette number
@@ -69,7 +70,7 @@ color color30 = color(3, 169, 244, 5);
 color[] palette6 = {color26, color27, color28, color29, color30};
 
 void setup() {
-  size(1200, 800, P2D);
+  size(1200, 800);
   cols = floor(width/scl);
   rows = floor(height/scl);
   flowfield = new PVector[rows][cols];
@@ -89,8 +90,6 @@ void setup() {
   myPort = new Serial(this, Serial.list()[1], 115200); //connect to second serial connection
   myPort.bufferUntil('\n'); //read until an end of line character
 
-  //wsc= new WebsocketClient(this, "ws://localhost:3000/mysocket");
-
   background(255); //set the screen to white
 }
 
@@ -101,20 +100,18 @@ void serialEvent(Serial myPort) {
 
   //if (inString != null) { //only do something if data came across serial port
   inString = trim(inString); //remove white space
-  println(inString); //write to console
+  println("Swipe direction: " + inString); //write to console
   //if instructions are on the page, then any gesture will remove them
   if (showInstructions) {
     if (inString.equals("L") || inString.equals("R") || inString.equals("U") || inString.equals("D")) {
-      removeInstructions();
+      removeInstructions(); //call function to remove the instructions
     }
   } else if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
     changeZoff(); //change flow field pattern
     changeLineColor(); //change particle color
   } else if (inString.equals("D")) { //check for down gesture
-    println("down swipe"); //log the down swipe
     downSwipe(); //call function to save image and start a new one
   } else if (inString.equals("U")) { //check for up swipe
-    //println("up swipe"); //log the up swipe
     upSwipe(); //call function to show instructions
   }
   //}
@@ -122,6 +119,10 @@ void serialEvent(Serial myPort) {
 
 void draw() {
   //background(255);
+  if (clearScreen){
+    clearScreen = false;
+    background(255);
+  }
   if (showInstructions) {
     background(255); //clear the screen
     rectMode(CENTER); //draw rectangle from its center
@@ -209,7 +210,7 @@ void keyPressed() {
 
 //remove instructions from the screen
 void removeInstructions() {
-  background(255); //clear screen
+  clearScreen = true; //clear screen
   showInstructions = false; //remove instructions
 }
 
@@ -221,7 +222,7 @@ void sideSwipe() {
 
 //show instructions on an up gesture
 void upSwipe() {
-  //background(255); //clear screen
+  clearScreen = true; //clear screen
   showInstructions = true; //add the instructions
 }
 
@@ -229,7 +230,7 @@ void upSwipe() {
 void downSwipe() {
   saveImage(); //call the function that saves the image
   changeColorPalette(); //call the function that changes the color palette
-  //background(255); //clear screen
+  clearScreen = true; //clear screen
 }
 
 //change the color palette
