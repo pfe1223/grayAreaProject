@@ -13,7 +13,7 @@ let client = new Twitter({ //Twitter credentials
   access_token_secret: process.env.ACCESS_TOKEN_SECRET
 });
 
-//set the folder to be watched to 'pics/awaiting/'
+//set the folder to be watched to 'pics/awaiting/', only look for png files
 let watcher = chokidar.watch('pics/awaiting/*.png', {
   ignored: /(^|[\/\\])\../,
   persistent: true,
@@ -23,21 +23,21 @@ let watcher = chokidar.watch('pics/awaiting/*.png', {
 //Start the Twitter posting process when a new image is added
 watcher.on('add', imagePath => {
   limiter.removeTokens(1, function(err, remaining) {
-    console.log(`${remaining} rate limit tokens remaining`)
-    postToTwitter(imagePath);
+    console.log(`${remaining} rate limit tokens remaining`); //log number of remaining API calls
+    startPostingProcess(imagePath); //begin process to post to Twitter
   });
 });
 
 
 
-//read image file name and pass it to another function
-function postToTwitter(imagePath) {
+//function to read image file name and pass it to another function
+function startPostingProcess(imagePath) {
   let data = fs.readFileSync(imagePath); //read the image from its location
   console.log(`Found a new file: ${imagePath}`); //log new image location
   twitterUpload(imagePath, data); //upload image to twitter
 }
 
-//post the image as a Twitter media object
+//function to post the image as a Twitter media object
 function twitterUpload(imagePath, data) {
   console.log(`Creating media string`);
   let media = {
@@ -59,7 +59,7 @@ function twitterUpload(imagePath, data) {
   });
 }
 
-//post the image to the Emergence Art account
+//function to post the image to the Emergence Art account
 function twitterPost(imagePath, status) {
   console.log(`Posting to Twitter`)
   let err, responseCode;
@@ -67,22 +67,21 @@ function twitterPost(imagePath, status) {
     responseCode = response.statusCode;
     if (!error) {
       console.log(`Success posting to Twitter: ${responseCode}`);
-      moveImage(imagePath, error, responseCode); //change image path
+      moveImage(imagePath, error, responseCode); //call funtion to move image file
     } else {
-      console.log(`Error posting to Twitter: ${responseCode}`);
-      console.log(response.body); //log actual error code
-      postToTwitter(imagePath);
+      console.log(`Error posting to Twitter: ${resoponse.body}`); //log error code of failed attempt
+      startPostingProcess(imagePath); //try again because of the error
     }
   });
 }
 
-//move image from the 'awaiting' folder to 'sent' folder
+//function to move image from the 'awaiting' folder to 'sent' folder
 function moveImage(imagePath, err, responseCode) {
   console.log(`Moving to sent folder`);
-  const imageBaseName = path.basename(imagePath);
-  const newImagePath = path.join('pics', 'sent', imageBaseName);
+  const imageBaseName = path.basename(imagePath); //base file name
+  const newImagePath = path.join('pics', 'sent', imageBaseName); //join base file name with folder path
 
-  fs.rename(imagePath, newImagePath, (err) => {
+  fs.rename(imagePath, newImagePath, (err) => { //move image to new folder
     if (err) throw err;
     console.log(`${imagePath} => ${newImagePath}`);
     console.log('****************************************');
