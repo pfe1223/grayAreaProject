@@ -14,7 +14,7 @@ let client = new Twitter({ //Twitter credentials
 });
 
 //set the folder to be watched to 'pics/awaiting/'
-let watcher = chokidar.watch('pics/awaiting/', {
+let watcher = chokidar.watch('pics/awaiting/*.png', {
   ignored: /(^|[\/\\])\../,
   persistent: true,
   ignoreInitial: false
@@ -23,6 +23,7 @@ let watcher = chokidar.watch('pics/awaiting/', {
 //Start the Twitter posting process when a new image is added
 watcher.on('add', imagePath => {
   limiter.removeTokens(1, function(err, remaining) {
+    console.log(`${remaining} rate limit tokens remaining`)
     postToTwitter(imagePath);
   });
 });
@@ -66,10 +67,10 @@ function twitterPost(imagePath, status) {
     responseCode = response.statusCode;
     if (!error) {
       console.log(`Success posting to Twitter: ${responseCode}`);
-      moveImage(imagePath, error, responseCode);
+      moveImage(imagePath, error, responseCode); //change image path
     } else {
       console.log(`Error posting to Twitter: ${responseCode}`);
-      console.log(response.body);
+      console.log(response.body); //log actual error code
       postToTwitter(imagePath);
     }
   });
