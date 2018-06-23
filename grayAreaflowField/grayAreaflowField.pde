@@ -98,28 +98,28 @@ void serialEvent(Serial myPort) {
 
   String inString = myPort.readStringUntil('\n'); //read until the '\n' character
 
-  //if (inString != null) { //only do something if data came across serial port
-  inString = trim(inString); //remove white space
-  println("Swipe direction: " + inString); //write to console
-  //if instructions are on the page, then any gesture will remove them
-  if (showInstructions) {
-    if (inString.equals("L") || inString.equals("R") || inString.equals("U") || inString.equals("D")) {
-      removeInstructions(); //call function to remove the instructions
+  if (inString != null) { //only do something if data came across serial port
+    inString = trim(inString); //remove white space
+    println("Swipe direction: " + inString); //write to console
+    //if instructions are on the page, then any gesture will remove them
+    if (showInstructions) {
+      if (inString.equals("L") || inString.equals("R") || inString.equals("U") || inString.equals("D")) {
+        removeInstructions(); //call function to remove the instructions
+      }
+    } else if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
+      changeZoff(); //change flow field pattern
+      changeLineColor(); //change particle color
+    } else if (inString.equals("D")) { //check for down gesture
+      downSwipe(); //call function to save image and start a new one
+    } else if (inString.equals("U")) { //check for up swipe
+      upSwipe(); //call function to show instructions
     }
-  } else if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
-    changeZoff(); //change flow field pattern
-    changeLineColor(); //change particle color
-  } else if (inString.equals("D")) { //check for down gesture
-    downSwipe(); //call function to save image and start a new one
-  } else if (inString.equals("U")) { //check for up swipe
-    upSwipe(); //call function to show instructions
   }
-  //}
 }
 
 void draw() {
   //background(255);
-  if (clearScreen){
+  if (clearScreen) {
     clearScreen = false;
     background(255);
   }
