@@ -63,12 +63,14 @@ function twitterPost(imagePath, status) {
   console.log(`Posting to Twitter`)
   let err, responseCode;
   client.post('statuses/update', status, function(error, tweet, response) {
+    responseCode = response.statusCode;
     if (!error) {
-      responseCode = response.statusCode;
       console.log(`Success posting to Twitter: ${responseCode}`);
-      moveImage(imagePath, err, responseCode);
+      moveImage(imagePath, error, responseCode);
     } else {
       console.log(`Error posting to Twitter: ${responseCode}`);
+      console.log(response.body);
+      postToTwitter(imagePath);
     }
   });
 }
@@ -82,5 +84,6 @@ function moveImage(imagePath, err, responseCode) {
   fs.rename(imagePath, newImagePath, (err) => {
     if (err) throw err;
     console.log(`${imagePath} => ${newImagePath}`);
+    console.log('****************************************');
   });
 }
