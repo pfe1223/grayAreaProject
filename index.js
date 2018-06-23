@@ -3,6 +3,8 @@ let chokidar = require('chokidar'); //folder watching module
 let Twitter = require('twitter'); //Twitter module
 const fs = require('fs'); //access the file system
 const path = require('path'); //write path names when moving folders
+const rateLimiter = require('limiter').RateLimiter; //rate limiter module
+let limiter = new rateLimiter(15, 900000, true);
 
 let client = new Twitter({ //Twitter credentials
   consumer_key: process.env.CONSUMER_KEY,
@@ -20,8 +22,12 @@ let watcher = chokidar.watch('pics/awaiting/', {
 
 //Start the Twitter posting process when a new image is added
 watcher.on('add', imagePath => {
-  postToTwitter(imagePath);
+  limiter.removeTokens(1, function(err, remaining) {
+    postToTwitter(imagePath);
+  });
 });
+
+
 
 //read image file name and pass it to another function
 function postToTwitter(imagePath) {
@@ -42,7 +48,7 @@ function twitterUpload(imagePath, data) {
       console.log(`Media string successful`)
       // Status message for the tweet
       status = {
-        status: '#GrayAreaSpringImmersive2018', // Hashtag
+        status: '#grayareashowcase', // Hashtag
         media_ids: media.media_id_string // Pass the media id string
       };
       twitterPost(imagePath, status);
