@@ -14,6 +14,7 @@ ArrayList<Particle> particles = new ArrayList<Particle>(); //variable for the ar
 PVector[][] flowfield; //variable for the 2D array that holds the flow field
 boolean showInstructions = false; //variable used for showing the instructions
 boolean clearScreen = false; //variable used to clear the screen
+int gap = 30; //gap between instruction page and the edge of the screen
 
 //Color Variables
 int colorNum; //represents the color palette number
@@ -79,7 +80,7 @@ void setup() {
   colorPalette = palette1;
   lineColor = colorPalette[colorIndex]; //set the particle color
   titleFont = loadFont("AvenirNext-Bold-100.vlw"); //font for title in instructions
-  bodyFont = loadFont("AvenirNext-Regular-70.vlw"); //font for instructions
+  bodyFont = loadFont("AvenirNext-Regular-65.vlw"); //font for instructions
 
   //add 10,000 particles
   for (int i = 0; i < 10000; i++) {
@@ -128,15 +129,15 @@ void draw() {
     rectMode(CENTER); //draw rectangle from its center
     noStroke(); //turn off the stroke
     fill(0, 10); //fill with a very transparent white
-    rect(width/2, height/2, width - 40, height - 40, 10); //draw a rectangle that is 40px smaller than the screen on all sides
+    rect(width/2, height/2, width - gap, height - gap, 10); //draw a rectangle that is 40px smaller than the screen on all sides
     textAlign(CENTER, CENTER); //center the text
     fill(0); //use black for the text
     textFont(titleFont); //use the larger font for the title
     text("Emergence", width/2, height*0.25); //title for the screen
     textFont(bodyFont); //switch to a smaller font for the rest of the instructions
     text("Swipe left/right to change the image", width/2, height*0.40); //how to alter the drawing
-    text("Swipe down to tweet the flow field", width/2, height*0.55); //how to tweet the drawing
-    text("#GrayAreaSpringImmersive2018", width/2, height*0.70); //hashtag to find the drawing
+    text("Swipe down to tweet your image", width/2, height*0.55); //how to tweet the drawing
+    text("#grayareashowcase @emergence_art", width/2, height*0.70); //hashtag to find the drawing
     text("Swipe to return to the image", width/2, height*0.85); //how to return to the drawing
   }
 
