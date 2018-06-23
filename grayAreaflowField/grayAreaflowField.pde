@@ -79,7 +79,7 @@ void setup() {
   titleFont = loadFont("AvenirNext-Bold-100.vlw"); //font for title in instructions
   bodyFont = loadFont("AvenirNext-Regular-65.vlw"); //font for instructions
 
-  //add 10,000 particles
+  //add 10,000 particles to the flow field
   for (int i = 0; i < 10000; i++) {
     particles.add(new Particle(lineColor));
   }
@@ -99,8 +99,7 @@ void serialEvent(Serial myPort) {
   if (inString != null) { //only do something if data came across serial port
     inString = trim(inString); //remove white space
     println("Swipe direction: " + inString); //write to console
-    //if instructions are on the page, then any gesture will remove them
-    if (showInstructions) {
+    if (showInstructions) { //if instructions are on the page, then any gesture will remove them
       if (inString.equals("L") || inString.equals("R") || inString.equals("U") || inString.equals("D")) {
         removeInstructions(); //call function to remove the instructions
       }
@@ -117,11 +116,11 @@ void serialEvent(Serial myPort) {
 
 void draw() {
   //background(255);
-  if (clearScreen) {
+  if (clearScreen) { //clear the screen
     clearScreen = false;
     background(255);
   }
-  if (showInstructions) {
+  if (showInstructions) { //write the instuctions to the screen
     background(255); //clear the screen
     rectMode(CENTER); //draw rectangle from its center
     noStroke(); //turn off the stroke
@@ -254,7 +253,7 @@ void changeColorPalette() {
 
 //save the screen as an image in the 'awaiting' folder
 void saveImage() {
-  //create a unique file name for the image
+  //create a unique file name (day-minute-milisecond) for the image
   String picName = "../pics/awaiting/image-" + str(day()) + "-" + str(minute()) + "-" + str(millis()) + ".png";
   save(picName); //save the image
 }
