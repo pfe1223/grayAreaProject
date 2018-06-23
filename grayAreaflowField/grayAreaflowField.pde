@@ -1,8 +1,5 @@
 import processing.serial.*; //library to use the serial port
 
-//AvenirNext Bold for the title
-//AvenirNext Regular for the instructions
-
 Serial myPort; //variable for the serial port
 PFont titleFont; //variable for the font used as the title in the instructions
 PFont bodyFont; //variable for the font used as the body of the instructions
