@@ -1,32 +1,36 @@
 require('dotenv').config()
-let chokidar = require('chokidar');
-let Twitter = require('twitter');
-const fs = require('fs');
-const path = require('path');
+let chokidar = require('chokidar'); //folder watching module
+let Twitter = require('twitter'); //Twitter module
+const fs = require('fs'); //access the file system
+const path = require('path'); //write path names when moving folders
 
-let client = new Twitter({
+let client = new Twitter({ //Twitter credentials
   consumer_key: process.env.CONSUMER_KEY,
   consumer_secret: process.env.CONSUMER_SECRET,
   access_token_key: process.env.ACCESS_TOKEN,
   access_token_secret: process.env.ACCESS_TOKEN_SECRET
 });
 
+//set the folder to be watched to 'pics/awaiting/'
 let watcher = chokidar.watch('pics/awaiting/', {
   ignored: /(^|[\/\\])\../,
   persistent: true,
   ignoreInitial: false
 });
 
+//Start the Twitter posting process when a new image is added
 watcher.on('add', imagePath => {
   postToTwitter(imagePath);
 });
 
+//read image file name and pass it to another function
 function postToTwitter(imagePath) {
   let data = fs.readFileSync(imagePath); //read the image from its location
   console.log(`Found a new file: ${imagePath}`); //log new image location
   twitterUpload(imagePath, data); //upload image to twitter
 }
 
+//post the image as a Twitter media object
 function twitterUpload(imagePath, data) {
   console.log(`Creating media string`);
   let media = {
@@ -48,6 +52,7 @@ function twitterUpload(imagePath, data) {
   });
 }
 
+//post the image to the Emergence Art account
 function twitterPost(imagePath, status) {
   console.log(`Posting to Twitter`)
   let err, responseCode;
@@ -62,6 +67,7 @@ function twitterPost(imagePath, status) {
   });
 }
 
+//move image from the 'awaiting' folder to 'sent' folder
 function moveImage(imagePath, err, responseCode) {
   console.log(`Moving to sent folder`);
   const imageBaseName = path.basename(imagePath);
@@ -71,8 +77,4 @@ function moveImage(imagePath, err, responseCode) {
     if (err) throw err;
     console.log(`${imagePath} => ${newImagePath}`);
   });
-}
-
-function tryAgain() {
-
 }
