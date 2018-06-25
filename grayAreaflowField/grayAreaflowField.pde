@@ -199,7 +199,7 @@ void downSwipe() {
   changeColorPalette(); //call the function that changes the color palette
   tweetSent = true; //post message to screen that image has been tweeted
   now = millis(); //current time right now
-  timer = now + 5000; //5 seconds in the future
+  timer = now + 4000; //4 seconds in the future
 }
 
 //change the color palette
