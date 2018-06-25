@@ -21,11 +21,11 @@ color color10 = color(232, 147, 30, transparency);
 color[] palette2 = {color6, color7, color8, color9, color10};
 
 //third color palette
-color color11 = color(54, 71, 81, transparency);
-color color12 = color(115, 141, 156, transparency);
-color color13 = color(244, 238, 226, transparency);
-color color14 = color(53, 71, 81, transparency);
-color color15 = color(245, 110, 107, transparency);
+color color11 = color(205, 132, 241, transparency);
+color color12 = color(58, 227, 116, transparency);
+color color13 = color(24, 220, 255, transparency);
+color color14 = color(255, 56, 56, transparency);
+color color15 = color(255, 250, 101, transparency);
 color[] palette3 = {color11, color12, color13, color14, color15};
 
 //fourth color palette
