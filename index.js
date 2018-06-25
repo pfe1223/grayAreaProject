@@ -4,7 +4,7 @@ let Twitter = require('twitter'); //Twitter module
 const fs = require('fs'); //access the file system
 const path = require('path'); //write path names when moving folders
 const rateLimiter = require('limiter').RateLimiter; //rate limiter module
-let limiter = new rateLimiter(15, 900000, true);
+let limiter = new rateLimiter(15, 900000, true); //limit tweets to 15 per 15-minute window
 
 let client = new Twitter({ //Twitter credentials
   consumer_key: process.env.CONSUMER_KEY,
