@@ -13,7 +13,7 @@ boolean showInstructions = false; //variable used for showing the instructions
 boolean clearScreen = false; //variable used to clear the screen
 int gap = 30; //gap between instruction page and the edge of the screen
 boolean tweetSent = false; //used to show a message once an image has been posted to Twitter
-int transparency = 5; //used to control the transparency of lines drawn on the screen
+int transparency = 5; //transparency attribute for lines drawn to the screen
 int now; //number of milliseconds at the exact moment
 int timer; //number of milliseconds until an event ends
 
@@ -199,7 +199,7 @@ void downSwipe() {
   changeColorPalette(); //call the function that changes the color palette
   tweetSent = true; //post message to screen that image has been tweeted
   now = millis(); //current time right now
-  timer = now + 7000; //time 7 seconds in the future
+  timer = now + 5000; //time 5 seconds in the future
 }
 
 //change the color palette
