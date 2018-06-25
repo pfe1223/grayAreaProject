@@ -142,7 +142,11 @@ void draw() {
     part.update(); //update position of the particle accroding to the force
     part.edges(); //move particle to opposite if off the screen
     part.show(); //draw the particle to the screen
-    part.updateColor(colorPalette[colorIndex]); //set the color of the particle
+    if (tweetSent || showInstructions) {
+      part.updateColor(color(255, 0));
+    } else {
+      part.updateColor(colorPalette[colorIndex]); //set the color of the particle
+    }
   }
 }
 
