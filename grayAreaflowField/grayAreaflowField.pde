@@ -14,60 +14,8 @@ boolean clearScreen = false; //variable used to clear the screen
 int gap = 30; //gap between instruction page and the edge of the screen
 boolean tweetSent = false; //used to show a message once an image has been posted to Twitter
 int transparency = 5; //used to control the transparency of lines drawn on the screen
-
-//Color Variables
-int colorNum; //represents the color palette number
-color[] colorPalette; //palette of colors used by the particles
-int colorIndex; //position in the color palette
-color lineColor; //color of the particles
-
-//first color palette
-color color1 = color(214, 35, 50, 5);
-color color2 = color(17, 54, 90, 5);
-color color3 = color(39, 188, 194, 5);
-color color4 = color(155, 89, 182, 5); 
-color color5 = color(248, 210, 0, 5);
-color[] palette1 = {color1, color2, color3, color4, color5};
-
-//second color palette
-color color6 = color(213, 71, 51, transparency);
-color color7 = color(14, 93, 158, transparency);
-color color8 = color(58, 168, 75, transparency);
-color color9 = color(236, 196, 23, transparency);
-color color10 = color(232, 147, 30, transparency);
-color[] palette2 = {color6, color7, color8, color9, color10};
-
-//third color palette
-color color11 = color(54, 71, 81, transparency);
-color color12 = color(115, 141, 156, transparency);
-color color13 = color(244, 238, 226, transparency);
-color color14 = color(53, 71, 81, transparency);
-color color15 = color(245, 110, 107, transparency);
-color[] palette3 = {color11, color12, color13, color14, color15};
-
-//fourth color palette
-color color16 = color(60, 0, 232, transparency);
-color color17 = color(245, 99, 12, transparency);
-color color18 = color(255, 13, 144, transparency);
-color color19 = color(13, 185, 255, transparency);
-color color20 = color(0, 245, 69, transparency);
-color[] palette4 = {color16, color17, color18, color19, color20};
-
-//fifth color palette
-color color21 = color(255, 0, 0, transparency);
-color color22 = color(255, 102, 0, transparency);
-color color23 = color(153, 204, 0, transparency);
-color color24 = color(0, 128, 128, transparency);
-color color25 = color(0, 51, 102, transparency);
-color[] palette5 = {color21, color22, color23, color24, color25};
-
-//sixth color palette
-color color26 = color(255, 60, 110, transparency);
-color color27 = color(255, 87, 34, transparency);
-color color28 = color(255, 202, 44, transparency);
-color color29 = color(38, 198, 218, transparency);
-color color30 = color(3, 169, 244, transparency);
-color[] palette6 = {color26, color27, color28, color29, color30};
+int now; //number of milliseconds at the exact moment
+int timer; //number of milliseconds until an event ends
 
 void setup() {
   size(1200, 800); //set the size of the drawing
@@ -122,6 +70,26 @@ void draw() {
     clearScreen = false;
     background(255);
   }
+
+  if (tweetSent) {
+    background(255); //clear the screen
+    rectMode(CENTER); //draw rectangle from its center
+    noStroke(); //turn off the stroke
+    fill(0, 10); //fill with a very transparent white
+    rect(width/2, height/2, width - gap, height - gap, 10); //draw a rectangle that is 40px smaller than the screen on all sides
+    textAlign(CENTER, CENTER); //center the text
+    fill(0); //use black for the text
+    textFont(titleFont); //use the larger font for the title
+    text("Tweet Sent", width/2, height*0.30); //title for the screen
+    textFont(bodyFont); //switch to a smaller font for the rest of the instructions
+    text("Find your image at", width/2, height*0.45); //Twitter account to find the drawing
+    text("@emergence_art", width/2, height*0.55); //Twitter account to find the drawing
+    if (millis() > timer) {
+      tweetSent = false;
+      background(255);
+    }
+  }
+
   if (showInstructions) { //write the instuctions to the screen
     background(255); //clear the screen
     rectMode(CENTER); //draw rectangle from its center
@@ -229,7 +197,9 @@ void upSwipe() {
 void downSwipe() {
   saveImage(); //call the function that saves the image
   changeColorPalette(); //call the function that changes the color palette
-  clearScreen = true; //clear screen
+  tweetSent = true; //post message to screen that image has been tweeted
+  now = millis(); //current time right now
+  timer = now + 7000; //time 7 seconds in the future
 }
 
 //change the color palette
