@@ -129,12 +129,12 @@ void draw() {
     textAlign(CENTER, CENTER); //center the text
     fill(0); //use black for the text
     textFont(titleFont); //use the larger font for the title
-    text("Emergence", width/2, height*0.25); //title for the screen
+    text("Emergence", width/2, height*0.20); //title for the screen
     textFont(bodyFont); //switch to a smaller font for the rest of the instructions
-    text("Swipe left/right to change the image", width/2, height*0.40); //how to alter the drawing
-    text("Swipe down to tweet your image", width/2, height*0.55); //how to tweet the drawing
-    text("#grayareashowcase @emergence_art", width/2, height*0.70); //hashtag to find the drawing
-    text("Swipe to return to the image", width/2, height*0.85); //how to return to the drawing
+    text("Swipe left/right to change the image", width/2, height*0.35); //how to alter the drawing
+    text("Swipe down to tweet your image", width/2, height*0.50); //how to tweet the drawing
+    text("Find your image at @emergence_art", width/2, height*0.65); //hashtag to find the drawing
+    text("Swipe to return to the image", width/2, height*0.80); //how to return to the drawing
   }
 
   float yoff = 0; //set the y-offset to 0
