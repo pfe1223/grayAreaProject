@@ -18,7 +18,7 @@ int now; //number of milliseconds at the exact moment
 int timer; //number of milliseconds until an event ends
 
 void setup() {
-  size(1200, 800); //set the size of the drawing
+  size(1650, 1100); //set the size of the drawing
   cols = floor(width/scl); //calculate number of columns
   rows = floor(height/scl); //calculate number of rows
   flowfield = new PVector[rows][cols]; //make 2D array with rows and columns
