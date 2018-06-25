@@ -18,7 +18,7 @@ int now; //number of milliseconds at the exact moment
 int timer; //number of milliseconds until an event ends
 
 void setup() {
-  size(1650, 1100); //set the size of the drawing
+  size(1920, 1080); //set the size of the drawing
   cols = floor(width/scl); //calculate number of columns
   rows = floor(height/scl); //calculate number of rows
   flowfield = new PVector[rows][cols]; //make 2D array with rows and columns
@@ -26,8 +26,8 @@ void setup() {
   colorNum = 1; //use the first color palette
   colorPalette = palette1;
   lineColor = colorPalette[colorIndex]; //set the particle color
-  titleFont = loadFont("AvenirNext-Bold-100.vlw"); //font for title in instructions
-  bodyFont = loadFont("AvenirNext-Regular-65.vlw"); //font for instructions
+  titleFont = loadFont("AvenirNext-Bold-120.vlw"); //font for title in instructions
+  bodyFont = loadFont("AvenirNext-Regular-80.vlw"); //font for instructions
 
   //add 10,000 particles to the flow field
   for (int i = 0; i < 10000; i++) {
