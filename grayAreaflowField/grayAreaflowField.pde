@@ -84,9 +84,9 @@ void draw() {
     textFont(bodyFont); //switch to a smaller font for the rest of the instructions
     text("Find your image at", width/2, height*0.45); //Twitter account to find the drawing
     text("@emergence_art", width/2, height*0.55); //Twitter account to find the drawing
-    if (millis() > timer) {
-      tweetSent = false;
-      background(255);
+    if (millis() > timer) { //checks to see if the current time is great than the timer
+      tweetSent = false; //set value back to default
+      background(255); //remove tweet sent message
     }
   }
 
@@ -199,7 +199,7 @@ void downSwipe() {
   changeColorPalette(); //call the function that changes the color palette
   tweetSent = true; //post message to screen that image has been tweeted
   now = millis(); //current time right now
-  timer = now + 5000; //time 5 seconds in the future
+  timer = now + 5000; //5 seconds in the future
 }
 
 //change the color palette
