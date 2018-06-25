@@ -5,11 +5,11 @@ int colorIndex; //position in the color palette
 color lineColor; //color of the particles
 
 //first color palette
-color color1 = color(214, 35, 50, 5);
-color color2 = color(17, 54, 90, 5);
-color color3 = color(39, 188, 194, 5);
-color color4 = color(155, 89, 182, 5); 
-color color5 = color(248, 210, 0, 5);
+color color1 = color(255, 166, 26, transparency);
+color color2 = color(11, 190, 134, transparency);
+color color3 = color(10, 25, 90, transparency);
+color color4 = color(249, 34, 94, transparency); 
+color color5 = color(137, 130, 120, transparency);
 color[] palette1 = {color1, color2, color3, color4, color5};
 
 //second color palette
