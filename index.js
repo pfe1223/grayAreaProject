@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config() //module to pull Twitter credentials from another file
 let chokidar = require('chokidar'); //folder watching module
 let Twitter = require('twitter'); //Twitter module
 const fs = require('fs'); //access the file system
@@ -28,8 +28,6 @@ watcher.on('add', imagePath => {
   });
 });
 
-
-
 //function to read image file name and pass it to another function
 function startPostingProcess(imagePath) {
   let data = fs.readFileSync(imagePath); //read the image from its location
@@ -40,36 +38,38 @@ function startPostingProcess(imagePath) {
 //function to post the image as a Twitter media object
 function twitterUpload(imagePath, data) {
   console.log(`Creating media string`);
-  let media = {
+  let media = { //create media object with the image file
     media: data
   };
   let status;
+  //post media object to Twitter (not in the timeline)
   client.post('media/upload', media, function(error, media, response) {
     if (!error) {
       console.log(`Media string successful`)
-      // Status message for the tweet
+      //status message for the tweet
       status = {
-        status: '#grayareashowcase', // Hashtag
+        //status: '#grayareashowcase', // Hashtag
         media_ids: media.media_id_string // Pass the media id string
       };
-      twitterPost(imagePath, status);
+      twitterPost(imagePath, status); //call function to post image to timeline
     } else {
       console.log("Media string response: ", response.body);
+      //startPostingProcess(imagePath); //try again because of the error
     }
   });
 }
 
 //function to post the image to the Emergence Art account
 function twitterPost(imagePath, status) {
-  console.log(`Posting to Twitter`)
-  let err, responseCode;
+  console.log(`Posting to Twitter`);
+  //let err, responseCode;
   client.post('statuses/update', status, function(error, tweet, response) {
-    responseCode = response.statusCode;
+    //responseCode = response.statusCode;
     if (!error) {
-      console.log(`Success posting to Twitter: ${responseCode}`);
-      moveImage(imagePath, error, responseCode); //call funtion to move image file
+      console.log(`Success posting to Twitter: ${response.statusCode}`);
+      moveImage(imagePath, error, response.statusCode); //call funtion to move image file
     } else {
-      console.log(`Error posting to Twitter: ${resoponse.body}`); //log error code of failed attempt
+      console.log(`Error posting to Twitter: ${response.body}`); //log error code of failed attempt
       startPostingProcess(imagePath); //try again because of the error
     }
   });
