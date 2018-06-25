@@ -28,7 +28,7 @@ class Particle {
 
   void show() {
     stroke(lineColor);
-    strokeWeight(1);
+    strokeWeight(2);
     //point(pos.x, pos.y);
     line(pos.x, pos.y, prevPos.x, prevPos.y);
     updatePrev();
