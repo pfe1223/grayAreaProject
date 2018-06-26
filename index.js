@@ -32,7 +32,7 @@ watcher.on('add', imagePath => {
 function startPostingProcess(imagePath) {
   let data = fs.readFileSync(imagePath); //read the image from its location
   console.log(`Found a new file: ${imagePath}`); //log new image location
-  twitterUpload(imagePath, data); //upload image to twitter
+  twitterUpload(imagePath, data);
 }
 
 //function to post the image as a Twitter media object
@@ -63,15 +63,17 @@ function twitterUpload(imagePath, data) {
 function twitterPost(imagePath, status) {
   console.log(`Posting to Twitter`);
   //let err, responseCode;
-  client.post('statuses/update', status, function(error, tweet, response) {
-    //responseCode = response.statusCode;
-    if (!error) {
-      console.log(`Success posting to Twitter: ${response.statusCode}`);
-      moveImage(imagePath, error, response.statusCode); //call funtion to move image file
-    } else {
-      console.log(`Error posting to Twitter: ${response.body}`); //log error code of failed attempt
-      startPostingProcess(imagePath); //try again because of the error
-    }
+  setTimeout(function() {
+    client.post('statuses/update', status, function(error, tweet, response) {
+      //responseCode = response.statusCode;
+      if (!error) {
+        console.log(`Success posting to Twitter: ${response.statusCode}`);
+        moveImage(imagePath, error, response.statusCode); //call funtion to move image file
+      } else {
+        console.log(`Error posting to Twitter: ${response.body}`); //log error code of failed attempt
+        //startPostingProcess(imagePath); //try again because of the error
+      }
+    }, 2000);
   });
 }
 
