@@ -24,7 +24,9 @@ let watcher = chokidar.watch('pics/awaiting/*.png', {
 watcher.on('add', imagePath => {
   limiter.removeTokens(1, function(err, remaining) {
     console.log(`${remaining} rate limit tokens remaining`); //log number of remaining API calls
-    startPostingProcess(imagePath); //begin process to post to Twitter
+    setTimeout(function() {
+      startPostingProcess(imagePath); //begin process to post to Twitter
+    }, 2000);
   });
 });
 
