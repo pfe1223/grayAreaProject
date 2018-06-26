@@ -73,10 +73,7 @@ void draw() {
 
   if (tweetSent) {
     background(255); //clear the screen
-    rectMode(CENTER); //draw rectangle from its center
     noStroke(); //turn off the stroke
-    fill(0, 10); //fill with a very transparent white
-    rect(width/2, height/2, width - gap, height - gap, 10); //draw a rectangle that is 40px smaller than the screen on all sides
     textAlign(CENTER, CENTER); //center the text
     fill(0); //use black for the text
     textFont(titleFont); //use the larger font for the title
@@ -92,10 +89,7 @@ void draw() {
 
   if (showInstructions) { //write the instuctions to the screen
     background(255); //clear the screen
-    rectMode(CENTER); //draw rectangle from its center
     noStroke(); //turn off the stroke
-    fill(0, 10); //fill with a very transparent white
-    rect(width/2, height/2, width - gap, height - gap, 10); //draw a rectangle that is 40px smaller than the screen on all sides
     textAlign(CENTER, CENTER); //center the text
     fill(0); //use black for the text
     textFont(titleFont); //use the larger font for the title
@@ -142,8 +136,8 @@ void draw() {
     part.update(); //update position of the particle accroding to the force
     part.edges(); //move particle to opposite if off the screen
     part.show(); //draw the particle to the screen
-    if (tweetSent || showInstructions) {
-      part.updateColor(color(255, 0));
+    if (tweetSent || showInstructions) { //if tweet sent or instructions are showing
+      part.updateColor(color(255, 0)); //make transparent particles/lines
     } else {
       part.updateColor(colorPalette[colorIndex]); //set the color of the particle
     }
