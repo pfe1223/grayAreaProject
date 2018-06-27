@@ -18,5 +18,8 @@ Emergence examines how changes to external incentives affect individual and grou
 * Computer to run the software
 
 ## Software
-* Adruino - reads the gesture sensor and sends a message ("L", "R", "U", or "D") to Processing via the serial port
-* Processing - creates a flow field for particles
+* Adruino - reads the gesture sensor and sends a message ("L", "R", "U", or "D") to Processing via the serial port.
+* Processing - creates a flow field for particles based on Perlin Noise. The flow field changes based on input from the gesture sensor. The particles will draw a line from their previous position to their current position.
+  * A left or right swipe will alter the directions (and thus the particles) of the flow field. These swipes will also chanage the color of the particles and their lines.
+  * An up swipe will bring up the instructions page.
+  * A down swip will save the image to a folder on the computer. This motion also changes the color palette for the particles. There are six palettes with five colors per palette.
