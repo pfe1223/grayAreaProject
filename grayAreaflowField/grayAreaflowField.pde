@@ -1,155 +1,120 @@
 import processing.serial.*; //library to use the serial port
 
-import gohai.simpletweet.*; //library to post to Twitter
-
-//think about changing the "rules of the game"
-//stronger connection to incentives in the piece
-//think about what the particle should be
-//maybe the "rules" change over time
-//AvenirNext Bold for the title
-//AvenirNext Regular for the instructions
-//chokidar module will watch a directory and send a callback on a new file
-//use Twitter module to tweet image on the above callback
-
-Serial myPort;
-SimpleTweet simpletweet;
-PFont titleFont;
-PFont bodyFont;
-float inc = 0.1;
-int scl = 10;
-int cols, rows;
-float zoff = 0;
-ArrayList<Particle> particles = new ArrayList<Particle>();
-PVector[][] flowfield;
-boolean showInstructions = false;
-
-//Color Variables
-int colorNum; //represents the color palette number
-color[] colorPalette; //palette of colors used by the particles
-int colorIndex; //position in the color palette
-color lineColor; //color of the particles
-
-color color1 = color(214, 35, 50, 5);
-color color2 = color(17, 54, 90, 5);
-color color3 = color(39, 188, 194, 5);
-color color4 = color(240, 242, 239, 5);
-color color5 = color(248, 210, 0, 5);
-color[] palette1 = {color1, color2, color3, color4, color5};
-
-color color6 = color(213, 71, 51, 5);
-color color7 = color(14, 93, 158, 5);
-color color8 = color(58, 168, 75, 5);
-color color9 = color(236, 196, 23, 5);
-color color10 = color(232, 147, 30, 5);
-color[] palette2 = {color6, color7, color8, color9, color10};
-
-color color11 = color(54, 71, 81, 5);
-color color12 = color(115, 141, 156, 5);
-color color13 = color(244, 238, 226, 5);
-color color14 = color(53, 71, 81, 5);
-color color15 = color(245, 110, 107, 5);
-color[] palette3 = {color11, color12, color13, color14, color15};
-
-color color16 = color(60, 0, 232, 5);
-color color17 = color(245, 99, 12, 5);
-color color18 = color(255, 13, 144, 5);
-color color19 = color(13, 185, 255, 5);
-color color20 = color(0, 245, 69, 5);
-color[] palette4 = {color16, color17, color18, color19, color20};
-
-color color21 = color(255, 0, 0, 5);
-color color22 = color(255, 102, 0, 5);
-color color23 = color(153, 204, 0, 5);
-color color24 = color(0, 128, 128, 5);
-color color25 = color(0, 51, 102, 5);
-color[] palette5 = {color21, color22, color23, color24, color25};
-
-color color26 = color(255, 60, 110, 5);
-color color27 = color(255, 87, 34, 5);
-color color28 = color(255, 202, 44, 5);
-color color29 = color(38, 198, 218, 5);
-color color30 = color(3, 169, 244, 5);
-color[] palette6 = {color26, color27, color28, color29, color30};
+Serial myPort; //variable for the serial port
+PFont titleFont; //variable for the font used as the title in the instructions
+PFont bodyFont; //variable for the font used as the body of the instructions
+float inc = 0.1; //variable for amount to be incremented
+int scl = 10; //variable for the scale of the grid for the flow field
+int cols, rows; //variables for the number of columns and rows
+float zoff = 0; //variable for the z-offset in the Perlin noise
+ArrayList<Particle> particles = new ArrayList<Particle>(); //variable for the array for the particles
+PVector[][] flowfield; //variable for the 2D array that holds the flow field
+boolean showInstructions = false; //variable used for showing the instructions
+boolean clearScreen = false; //variable used to clear the screen
+int gap = 30; //gap between instruction page and the edge of the screen
+boolean tweetSent = false; //used to show a message once an image has been posted to Twitter
+int transparency = 5; //transparency attribute for lines drawn to the screen
+int now; //number of milliseconds at the exact moment
+int timer; //number of milliseconds until an event ends
 
 void setup() {
-  size(1200, 800, P2D);
-  cols = floor(width/scl);
-  rows = floor(height/scl);
-  flowfield = new PVector[rows][cols];
+  size(1920, 1080); //set the size of the drawing
+  cols = floor(width/scl); //calculate number of columns
+  rows = floor(height/scl); //calculate number of rows
+  flowfield = new PVector[rows][cols]; //make 2D array with rows and columns
   colorIndex = 0; //use first color in the array
   colorNum = 1; //use the first color palette
   colorPalette = palette1;
   lineColor = colorPalette[colorIndex]; //set the particle color
-  titleFont = loadFont("AvenirNext-Bold-48.vlw");
-  bodyFont = loadFont("AvenirNext-Medium-36.vlw");
+  titleFont = loadFont("AvenirNext-Bold-120.vlw"); //font for title in instructions
+  bodyFont = loadFont("AvenirNext-Regular-80.vlw"); //font for instructions
 
+  //add 10,000 particles to the flow field
   for (int i = 0; i < 10000; i++) {
     particles.add(new Particle(lineColor));
   }
 
-  println(Serial.list());
-  myPort = new Serial(this, Serial.list()[1], 115200);
-  myPort.bufferUntil('\n');
+  println(Serial.list()); //print list of available serial connections
+  myPort = new Serial(this, Serial.list()[1], 115200); //connect to second serial connection
+  myPort.bufferUntil('\n'); //read until an end of line character
 
-  simpletweet = new SimpleTweet(this); //Twitter variable
-
-  //Twitter credentials
-  //simpletweet.setOAuthConsumerKey("fe96NGOMvwBKK07S5MT7iVaMT");
-  //simpletweet.setOAuthConsumerSecret("rVvk3di9K9r2i8DKmSFIdOC4pdyu8zUe3mtdJPDAOAox4MlgF6");
-  //simpletweet.setOAuthAccessToken("763439881141878784-0z27OGXe37Fl0sxGyiDPSQQSvHXGmUm");
-  //simpletweet.setOAuthAccessTokenSecret("2ceQdt0cbDK7Rwz0rQXmPuocds6QrXwXs5EL1byilfrMl");
-
-  background(255);
+  background(255); //set the screen to white
 }
 
 //read data from the serial port
 void serialEvent(Serial myPort) {
-  //read until the '\n' character
-  String inString = myPort.readStringUntil('\n');
+
+  String inString = myPort.readStringUntil('\n'); //read until the '\n' character
 
   if (inString != null) { //only do something if data came across serial port
     inString = trim(inString); //remove white space
-    println(inString); //write to console
-    if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
+    println("Swipe direction: " + inString); //write to console
+    if (showInstructions) { //if instructions are on the page, then any gesture will remove them
+      if (inString.equals("L") || inString.equals("R") || inString.equals("U") || inString.equals("D")) {
+        removeInstructions(); //call function to remove the instructions
+      }
+    } else if (inString.equals("L") || inString.equals("R")) { //check for L/R gesture
       changeZoff(); //change flow field pattern
       changeLineColor(); //change particle color
     } else if (inString.equals("D")) { //check for down gesture
-      println("down swipe");
-      downSwipe();
+      downSwipe(); //call function to save image and start a new one
+    } else if (inString.equals("U")) { //check for up swipe
+      upSwipe(); //call function to show instructions
     }
   }
 }
 
 void draw() {
   //background(255);
-  if (showInstructions) {
+  if (clearScreen) { //clear the screen
+    clearScreen = false;
     background(255);
-    rectMode(CENTER);
-    noStroke();
-    fill(0, 10);
-    rect(width/2, height/2, width - 40, height - 40, 10);
-    textAlign(CENTER, CENTER);
-    fill(0);
-    textFont(titleFont);
-    text("Emergence", width/2, height*0.2);
-    textFont(bodyFont);
-    text("Swipe left or right to change the flow field", width/2, height*0.3);
-    text("Swipe down to tweet the flow field", width/2, height*0.375);
-    text("Check #GrayAreaSpringImmersive2018", width/2, height*0.45);
-    text("Swipe any direction to return to the flow field", width/2, height*0.525);
   }
 
-  float yoff = 0;
-  for (int y = 0; y < rows; y++) {
-    float xoff = 0;
-    for (int x = 0; x < cols; x++) {
-      float angle = noise(xoff, yoff, zoff) * TWO_PI * 3;
-      PVector v = PVector.fromAngle(angle);
-      v.setMag(0.5);
-      flowfield[y][x] = v;
-      xoff += inc;
+  if (tweetSent) {
+    background(255); //clear the screen
+    noStroke(); //turn off the stroke
+    textAlign(CENTER, CENTER); //center the text
+    fill(0); //use black for the text
+    textFont(titleFont); //use the larger font for the title
+    text("Tweet Sent", width/2, height*0.30); //title for the screen
+    textFont(bodyFont); //switch to a smaller font for the rest of the instructions
+    text("Find your image at", width/2, height*0.45); //Twitter account to find the drawing
+    text("@emergence_art", width/2, height*0.55); //Twitter account to find the drawing
+    if (millis() > timer) { //checks to see if the current time is great than the timer
+      tweetSent = false; //set value back to default
+      background(255); //remove tweet sent message
+    }
+  }
+
+  if (showInstructions) { //write the instuctions to the screen
+    background(255); //clear the screen
+    noStroke(); //turn off the stroke
+    textAlign(CENTER, CENTER); //center the text
+    fill(0); //use black for the text
+    textFont(titleFont); //use the larger font for the title
+    text("Emergence", width/2, height*0.20); //title for the screen
+    textFont(bodyFont); //switch to a smaller font for the rest of the instructions
+    text("Swipe left/right to change the image", width/2, height*0.35); //how to alter the drawing
+    text("Swipe down to tweet your image", width/2, height*0.50); //how to tweet the drawing
+    text("Find your image at @emergence_art", width/2, height*0.65); //hashtag to find the drawing
+    text("Swipe to return to the image", width/2, height*0.80); //how to return to the drawing
+  }
+
+  float yoff = 0; //set the y-offset to 0
+  for (int y = 0; y < rows; y++) { //loop through the rows of the 2D array
+    float xoff = 0; //set the x-offset to 0
+    for (int x = 0; x < cols; x++) { //loop through colomns of the 2D array
+      float angle = noise(xoff, yoff, zoff) * TWO_PI * 3; //create angle from perlin noise
+      PVector v = PVector.fromAngle(angle); //create vector from the angle
+      v.setMag(0.5); //set magnitude of the vector
+      flowfield[y][x] = v; //assign the vector to the 2D array
+      xoff += inc; //increment the x-offset
       //***************
       //draw the flow field to the canvas
+      //be sure to uncomment the 'background(255)'
+      //command at the top of draw to see the 
+      //flow field
       //***************
       //stroke(0, 100);
       //pushMatrix();
@@ -162,85 +127,103 @@ void draw() {
       //end of drawing flow field
       //***************
     }
-    yoff += inc;
+    yoff += inc; //increment the y-offset
   }
 
+  //loop through particles
   for (Particle part : particles) {
-    part.follow(flowfield);
-    part.update();
-    part.edges();
-    part.show();
-    part.updateColor(colorPalette[colorIndex]);
+    part.follow(flowfield); //get new force from vector in 2D array
+    part.update(); //update position of the particle accroding to the force
+    part.edges(); //move particle to opposite if off the screen
+    part.show(); //draw the particle to the screen
+    if (tweetSent || showInstructions) { //if tweet sent or instructions are showing
+      part.updateColor(color(255, 0)); //make transparent particles/lines
+    } else {
+      part.updateColor(colorPalette[colorIndex]); //set the color of the particle
+    }
   }
 }
 
+//change the path of the particle, called on left/right gesture
 void changeZoff() {
   zoff += random(0.005, 1);
 }
 
 //change the color of the lines
 void changeLineColor() {
-  colorIndex++;
+  colorIndex++; //move to the next color
   if (colorIndex > colorPalette.length - 1) {
-    colorIndex = 0;
+    colorIndex = 0; //go back to beginning of color palette if the index is too big
   }
-  //color c = colorPalette[colorIndex];
-  //for (Particle part : particles) {
-  //  part.updateColor(c);
-  //}
 }
 
+//used in place of the gesture swipes
 void keyPressed() {
+  //if instructions are on the page, then any gesture will remove them
   if (showInstructions) {
     if (keyCode == LEFT || keyCode == RIGHT || keyCode == UP || keyCode == DOWN) {
       removeInstructions();
     }
   } else if (keyCode == LEFT || keyCode == RIGHT) {
-    sideSwipe();
+    sideSwipe(); //called on left/right arrow (left/right gesture)
   } else if (keyCode == UP) {
-    upSwipe();
+    upSwipe(); //called on up arrow (up gesture)
   } else if (keyCode == DOWN) {
-    downSwipe();
+    downSwipe(); //called on down arrow (down gesture)
   }
 }
 
 //remove instructions from the screen
 void removeInstructions() {
-  background(255);
-  showInstructions = false;
+  clearScreen = true; //clear screen
+  showInstructions = false; //remove instructions
 }
 
 //change color of the particles on a left/right gesture
 void sideSwipe() {
-  changeZoff();
-  changeLineColor();
+  changeZoff(); //alter path of particle
+  changeLineColor(); //change particle color
 }
 
 //show instructions on an up gesture
 void upSwipe() {
-  background(255);
-  showInstructions = true;
+  clearScreen = true; //clear screen
+  showInstructions = true; //add the instructions
 }
 
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
-  save("../pics/image" + str(day()) + str(frameCount) + ".png");
-  background(255);
-  colorNum++;
+  saveImage(); //call the function that saves the image
+  changeColorPalette(); //call the function that changes the color palette
+  tweetSent = true; //post message to screen that image has been tweeted
+  now = millis(); //current time right now
+  timer = now + 4000; //4 seconds in the future
+}
+
+//change the color palette
+void changeColorPalette() {
+  colorNum++; //increment variable that controls the color palette
   if (colorNum > 6) {
-    colorNum = 1;
+    colorNum = 1; //if at the end of the palette list, start at the beginning
   }
   if (colorNum == 1) {
-    colorPalette = palette1;
+    colorPalette = palette1; //use the first color palette
   } else if (colorNum == 2) {
-    colorPalette = palette2;
+    colorPalette = palette2; //use the second color palette
   } else if (colorNum == 3) {
-    colorPalette = palette3;
+    colorPalette = palette3; //use the third color palette
   } else if (colorNum == 4) {
-    colorPalette = palette4;
+    colorPalette = palette4; //use the fourth color palette
   } else if (colorNum == 5) {
-    colorPalette = palette5;
+    colorPalette = palette5; //use the fifth color palette
   } else if (colorNum == 6) {
-    colorPalette = palette6;
+    colorPalette = palette6; //use the sixth color palette
   }
+}
+
+//save the screen as an image in the 'awaiting' folder
+void saveImage() {
+  //create a unique file name (day-minute-milisecond) for the image
+  String picName = "../pics/awaiting/image-" + str(day()) + "-" + str(minute()) + "-" + str(millis()) + ".png";
+  save(picName); //save the image
 }

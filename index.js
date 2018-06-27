@@ -1,98 +1,93 @@
-//fs rename to move, don't need Sync version
-//
+require('dotenv').config() //module to pull Twitter credentials from another file
+let chokidar = require('chokidar'); //folder watching module
+let Twitter = require('twitter'); //Twitter module
+const fs = require('fs'); //access the file system
+const path = require('path'); //write path names when moving folders
+const rateLimiter = require('limiter').RateLimiter; //rate limiter module
+let limiter = new rateLimiter(15, 900000, true); //limit tweets to 15 per 15-minute window
 
-let chokidar = require('chokidar');
-let Twitter = require('twitter');
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({
-  port: 3000
+let client = new Twitter({ //Twitter credentials
+  consumer_key: process.env.CONSUMER_KEY,
+  consumer_secret: process.env.CONSUMER_SECRET,
+  access_token_key: process.env.ACCESS_TOKEN,
+  access_token_secret: process.env.ACCESS_TOKEN_SECRET
 });
 
-let client = new Twitter({
-  consumer_key: 'fe96NGOMvwBKK07S5MT7iVaMT',
-  consumer_secret: 'rVvk3di9K9r2i8DKmSFIdOC4pdyu8zUe3mtdJPDAOAox4MlgF6',
-  access_token_key: '763439881141878784-0z27OGXe37Fl0sxGyiDPSQQSvHXGmUm',
-  access_token_secret: '2ceQdt0cbDK7Rwz0rQXmPuocds6QrXwXs5EL1byilfrMl'
+//set the folder to be watched to 'pics/awaiting/', only look for png files
+let watcher = chokidar.watch('pics/awaiting/*.png', {
+  ignored: /(^|[\/\\])\../,
+  persistent: true,
+  ignoreInitial: false
 });
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    console.log('callback received: %s', message)
-    if (message[0] === "." && message[1] === ".") { //check to see if image path was sent
-      console.log("got an image path");
-      let path = message.substring(3); //remove the '../' from image file name
-      let data = require('fs').readFileSync(path); //read the image file
-      client.post('media/upload', {
-        media: data
-      }, function(error, media, response) {
+//Start the Twitter posting process when a new image is added
+watcher.on('add', imagePath => {
+  limiter.removeTokens(1, function(err, remaining) {
+    console.log(`${remaining} rate limit tokens remaining`); //log number of remaining API calls
+    setTimeout(function() {
+      startPostingProcess(imagePath); //begin process to post to Twitter
+    }, 2000);
+  });
+});
 
-        if (!error) {
+//function to read image file name and pass it to another function
+function startPostingProcess(imagePath) {
+  let data = fs.readFileSync(imagePath); //read the image from its location
+  console.log(`Found a new file: ${imagePath}`); //log new image location
+  twitterUpload(imagePath, data);
+}
 
-          // If successful, a media object will be returned.
-          //console.log(media);
-
-          // Lets tweet it
-          let status = {
-            status: '#GrayAreaImmersive',
-            media_ids: media.media_id_string // Pass the media id string
-          }
-
-          client.post('statuses/update', status, function(error, tweet, response) {
-            if (!error) {
-              //console.log(tweet);
-              console.log("Twitter response status: " + response.statusCode); //log status code of tweet
-              if (response.statusCode === 200) {
-                ws.send("Node sent a tweet"); //tweet confirmation
-              }
-            }
-          });
-
-        } else {
-          console.log(`There is an error: ${error}`); //log Twitter posting error(s)
-        }
-      });
+//function to post the image as a Twitter media object
+function twitterUpload(imagePath, data) {
+  console.log(`Creating media string`);
+  let media = { //create media object with the image file
+    media: data
+  };
+  let status;
+  //post media object to Twitter (not in the timeline)
+  client.post('media/upload', media, function(error, media, response) {
+    if (!error) {
+      console.log(`Media string successful`)
+      //status message for the tweet
+      status = {
+        //status: '#grayareashowcase', // Hashtag
+        media_ids: media.media_id_string // Pass the media id string
+      };
+      twitterPost(imagePath, status); //call function to post image to timeline
+    } else {
+      console.log("Media string response: ", response.body);
+      //startPostingProcess(imagePath); //try again because of the error
     }
   });
-  ws.send('Connected to websockets'); //initial websocket connection message
-});
+}
 
-// let watcher = chokidar.watch('pics/', {
-//   ignored: /(^|[\/\\])\../,
-//   persistent: true
-// });
+//function to post the image to the Emergence Art account
+function twitterPost(imagePath, status) {
+  console.log(`Posting to Twitter`);
+  //let err, responseCode;
+  setTimeout(function() {
+    client.post('statuses/update', status, function(error, tweet, response) {
+      //responseCode = response.statusCode;
+      if (!error) {
+        console.log(`Success posting to Twitter: ${response.statusCode}`);
+        moveImage(imagePath, error, response.statusCode); //call funtion to move image file
+      } else {
+        console.log(`Error posting to Twitter: ${response.body}`); //log error code of failed attempt
+        //startPostingProcess(imagePath); //try again because of the error
+      }
+    }, 2000);
+  });
+}
 
-// watcher.on('change', path => {
-//   //read the image from its location
-//   let data = require('fs').readFileSync(path);
-//
-//   //post the image to Twitter
-//   client.post('media/upload', {
-//     media: data
-//   }, function(error, media, response) {
-//
-//     if (!error) {
-//
-//       // If successful, a media object will be returned.
-//       //console.log(media);
-//
-//       // Lets tweet it
-//       let status = {
-//         status: '#GrayAreaImmersive',
-//         media_ids: media.media_id_string // Pass the media id string
-//       }
-//
-//       client.post('statuses/update', status, function(error, tweet, response) {
-//         if (!error) {
-//           //console.log(tweet);
-//           console.log("Twitter response status: " + response.statusCode);
-//           // wbs.send("successful tweet", function() {
-//           //   console.log("Sent websockets message")
-//           // });
-//         }
-//       });
-//
-//     } else {
-//       console.log(`There is an error: ${error}`);
-//     }
-//   });
-// });
+//function to move image from the 'awaiting' folder to 'sent' folder
+function moveImage(imagePath, err, responseCode) {
+  console.log(`Moving to sent folder`);
+  const imageBaseName = path.basename(imagePath); //base file name
+  const newImagePath = path.join('pics', 'sent', imageBaseName); //join base file name with folder path
+
+  fs.rename(imagePath, newImagePath, (err) => { //move image to new folder
+    if (err) throw err;
+    console.log(`${imagePath} => ${newImagePath}`);
+    console.log('****************************************');
+  });
+}
