@@ -23,3 +23,4 @@ Emergence examines how changes to external incentives affect individual and grou
   * A left or right swipe will alter the directions (and thus the particles) of the flow field. These swipes will also chanage the color of the particles and their lines.
   * An up swipe will bring up the instructions page.
   * A down swip will save the image to a folder on the computer. This motion also changes the color palette for the particles. There are six palettes with five colors per palette.
+* Node - watches the folder that receives the images from Processing. When a new image is saved, Node will read the file, tweet it to [@emergence_art](https://www.twitter.com/emergence_art), and then moves it from the "awaiting" folder to the "sent" folder.
