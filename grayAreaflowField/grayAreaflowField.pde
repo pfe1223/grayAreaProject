@@ -193,11 +193,13 @@ void upSwipe() {
 
 //clear canvas, send tweet, and change color on a down gesture
 void downSwipe() {
-  saveImage(); //call the function that saves the image
-  changeColorPalette(); //call the function that changes the color palette
-  tweetSent = true; //post message to screen that image has been tweeted
-  now = millis(); //current time right now
-  timer = now + 4000; //4 seconds in the future
+  if (!showInstructions) {
+    saveImage(); //call the function that saves the image
+    changeColorPalette(); //call the function that changes the color palette
+    tweetSent = true; //post message to screen that image has been tweeted
+    now = millis(); //current time right now
+    timer = now + 4000; //4 seconds in the future
+  }
 }
 
 //change the color palette
